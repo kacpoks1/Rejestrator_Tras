@@ -29,6 +29,9 @@ interface RouteDao {
     @Query("SELECT * FROM routes WHERE name = :name LIMIT 1")
     suspend fun getRouteByName(name: String): RouteEntity?
 
+    @Query("SELECT * FROM routes WHERE date >= :startOfDay AND date <= :endOfDay AND name LIKE :namePattern LIMIT 1")
+    suspend fun getRouteByDateAndType(startOfDay: Long, endOfDay: Long, namePattern: String): RouteEntity?
+
     @Query("DELETE FROM routes WHERE id = :routeId")
     suspend fun deleteRouteById(routeId: Long)
 

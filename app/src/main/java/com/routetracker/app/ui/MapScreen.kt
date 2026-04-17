@@ -385,8 +385,7 @@ fun MapScreen(
                             IconButton(onClick = { showSettingsMenu = true }) {
                                 Icon(
                                     imageVector = Icons.Default.Settings,
-                                    contentDescription = "Ustawienia",
-                                    tint = MaterialTheme.colorScheme.onPrimary
+                                    contentDescription = "Ustawienia"
                                 )
                             }
                         }

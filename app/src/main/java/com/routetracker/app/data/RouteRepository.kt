@@ -74,15 +74,37 @@ class RouteRepository(
         distanceKm: Double,
         durationSeconds: Long,
         averageSpeed: Double,
-        maxSpeed: Double
+        maxSpeed: Double,
+        mergeByDate: Boolean = false
     ): Long {
-        // Check if a route with this name already exists
-        val existingRoute = routeDao.getRouteByName(name)
+        // Check if a route with this name already exists, or if we should merge by date/type
+        val existingRoute = if (mergeByDate) {
+            val calendar = java.util.Calendar.getInstance()
+            calendar.timeInMillis = date
+            calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
+            calendar.set(java.util.Calendar.MINUTE, 0)
+            calendar.set(java.util.Calendar.SECOND, 0)
+            calendar.set(java.util.Calendar.MILLISECOND, 0)
+            val startOfDay = calendar.timeInMillis
+            
+            calendar.set(java.util.Calendar.HOUR_OF_DAY, 23)
+            calendar.set(java.util.Calendar.MINUTE, 59)
+            calendar.set(java.util.Calendar.SECOND, 59)
+            calendar.set(java.util.Calendar.MILLISECOND, 999)
+            val endOfDay = calendar.timeInMillis
+            
+            // Search by date and name pattern (to separate BT from manual)
+            val pattern = if (name.startsWith("BT Auto")) "BT Auto%" else "Route%"
+            routeDao.getRouteByDateAndType(startOfDay, endOfDay, pattern) ?: routeDao.getRouteByName(name)
+        } else {
+            routeDao.getRouteByName(name)
+        }
 
         return if (existingRoute != null) {
             val routeId = existingRoute.id
             val existingPoints = getTrackPointsForRoute(routeId)
             val allPoints = existingPoints + trackPoints
+            val finalName = existingRoute.name
 
             // Recalculate stats for the entire merged route
             val totalDistance = gpxManager.calculateTotalDistance(allPoints)
@@ -93,7 +115,7 @@ class RouteRepository(
             // Update GPX file (overwrite with all points)
             val gpxFile = File(existingRoute.gpxFilePath)
             withContext(Dispatchers.IO) {
-                val gpxContent = gpxManager.generateGpx(allPoints, name)
+                val gpxContent = gpxManager.generateGpx(allPoints, finalName)
                 gpxFile.writeText(gpxContent)
             }
 

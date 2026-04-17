@@ -53,11 +53,14 @@ class BluetoothManager(private val context: Context) {
         }
     }
 
-    @SuppressLint("MissingPermission")
     fun getPairedDevices(): List<BluetoothDeviceInfo> {
-        return bluetoothAdapter?.bondedDevices?.map {
-            BluetoothDeviceInfo(it.name ?: "Unknown", it.address)
-        } ?: emptyList()
+        try {
+            return bluetoothAdapter?.bondedDevices?.map {
+                BluetoothDeviceInfo(it.name ?: "Unknown", it.address)
+            } ?: emptyList()
+        } catch (e: SecurityException) {
+            return emptyList()
+        }
     }
 
     fun startWatching(deviceAddress: String) {

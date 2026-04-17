@@ -171,7 +171,12 @@ class RouteViewModel(application: Application) : AndroidViewModel(application) {
                         if (_isRecording.value) {
                             stopRecording(application)
                             _routeSummary.value?.let {
-                                saveRoute("BT Auto: ${it.trackPoints.firstOrNull()?.timestamp ?: ""}")
+                                val dateStr = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+                                    .format(java.util.Date())
+                                saveRoute(
+                                    name = "BT Auto: $dateStr",
+                                    mergeByDate = true
+                                )
                             }
                         }
                     }
@@ -247,7 +252,7 @@ class RouteViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Save the recorded route to the database.
      */
-    fun saveRoute(name: String) {
+    fun saveRoute(name: String, mergeByDate: Boolean = false) {
         val summary = _routeSummary.value ?: return
 
         viewModelScope.launch {
@@ -258,7 +263,8 @@ class RouteViewModel(application: Application) : AndroidViewModel(application) {
                 distanceKm = summary.distanceKm,
                 durationSeconds = summary.durationSeconds,
                 averageSpeed = summary.averageSpeed,
-                maxSpeed = summary.maxSpeed
+                maxSpeed = summary.maxSpeed,
+                mergeByDate = mergeByDate
             )
             loadSavedRoutes()
             _routeSummary.value = null

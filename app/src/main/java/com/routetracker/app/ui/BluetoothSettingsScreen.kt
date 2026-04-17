@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,16 +35,24 @@ fun BluetoothSettingsScreen(
     val context = LocalContext.current
     val btEnabled by viewModel.isBtAutoStartEnabled.collectAsState()
     val savedDevice by viewModel.btPreferredDevice.collectAsState()
-    val pairedDevices = remember { viewModel.getPairedBluetoothDevices() }
     
-    var selectedDeviceAddress by remember { mutableStateOf(savedDevice?.address) }
-    var selectedDeviceName by remember { mutableStateOf(savedDevice?.name) }
-
     val bluetoothConnectPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         rememberPermissionState(Manifest.permission.BLUETOOTH_CONNECT)
     } else {
         null
     }
+
+    val pairedDevices by produceState<List<BluetoothDeviceInfo>>(
+        initialValue = emptyList(),
+        key1 = bluetoothConnectPermission?.status?.isGranted
+    ) {
+        if (bluetoothConnectPermission == null || bluetoothConnectPermission.status.isGranted) {
+            value = viewModel.getPairedBluetoothDevices()
+        }
+    }
+    
+    var selectedDeviceAddress by remember { mutableStateOf(savedDevice?.address) }
+    var selectedDeviceName by remember { mutableStateOf(savedDevice?.name) }
 
     Scaffold(
         topBar = {
@@ -52,7 +60,7 @@ fun BluetoothSettingsScreen(
                 title = { Text("Bluetooth auto-start") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
