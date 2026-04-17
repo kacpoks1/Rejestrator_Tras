@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Route Tracker</string>
+    <string name="start_recording">Start</string>
+    <string name="stop_recording">Stop</string>
+    <string name="recording_route">Recording route…</string>
+    <string name="stop">Stop</string>
+    <string name="optimize_battery">Optimize battery</string>
+    <string name="locate_me">Locate me</string>
+    <string name="saved_routes">Saved Routes</string>
+    <string name="no_routes">No routes yet</string>
+    <string name="no_routes_description">Start recording to create your first route</string>
+    <string name="route_name">Route name</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="show_on_map">Show on map</string>
+    <string name="share_gpx">Share GPX</string>
+    <string name="delete">Delete</string>
+    <string name="export_all">Export all</string>
+    <string name="route_deleted">Route deleted</string>
+    <string name="undo">Undo</string>
+    <string name="permission_required">Permission required</string>
+    <string name="location_permission_rationale">Location permission is required for tracking your route</string>
+    <string name="background_location_rationale">Background location permission allows tracking your route even when the app is not visible. This is required for the tracking service to work properly.</string>
+    <string name="grant_permission">Grant permission</string>
+    <string name="open_settings">Open settings</string>
+    <string name="distance">Distance</string>
+    <string name="duration">Duration</string>
+    <string name="speed">Speed</string>
+    <string name="points">Points</string>
+    <string name="avg_speed">Avg speed</string>
+    <string name="max_speed">Max speed</string>
+    <string name="route_summary">Route Summary</string>
+    <string name="enter_route_name">Enter route name</string>
+</resources>

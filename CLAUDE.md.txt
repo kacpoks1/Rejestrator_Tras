@@ -1,0 +1,57 @@
+# CLAUDE.md — Rejestrator Tras (Android)
+
+## Projekt
+Aplikacja Android do śledzenia tras GPS z eksportem GPX.
+Katalog: `~\AndroidStudioProjects\Rejestrator_Tras`
+Package: `com.routetracker.app`
+
+## Stack
+- Kotlin + Jetpack Compose + Material3
+- Room (baza danych tras i punktów GPS)
+- OSMDroid (mapa OpenStreetMap)
+- FusedLocationProvider (lokalizacja)
+- Foreground Service (śledzenie w tle)
+- Navigation Compose
+- DataStore Preferences
+- Accompanist Permissions
+
+## Co zostało zrobione
+- [x] gradle/libs.versions.toml — zaktualizowane zależności (AGP 8.7.3, Kotlin 2.1.0)
+- [x] app/build.gradle.kts — dodane wszystkie zależności, Java 17, kapt
+- [x] AndroidManifest.xml — uprawnienia GPS, foreground service, FileProvider
+- [x] res/xml/file_paths.xml — konfiguracja FileProvider dla GPX
+- [x] res/values/strings.xml — wszystkie stringi PL/EN
+- [x] res/drawable/ — ikony wektorowe (menu, location, share, export, delete, map)
+- [x] models/TrackPoint.kt — model punktu GPS
+- [x] models/Route.kt — model trasy
+- [x] data/RouteEntity.kt — Room entity (tabela routes)
+- [x] data/TrackPointEntity.kt — Room entity (tabela track_points, FK do routes)
+- [x] data/RouteDao.kt — operacje CRUD na trasach i punktach
+- [x] data/AppDatabase.kt — singleton Room database
+- [x] data/RouteRepository.kt — warstwa repo dla ViewModel
+- [x] data/GpxManager.kt — generowanie i eksport GPX, FileProvider URI
+- [x] service/TrackingService.kt — foreground service z lokalizacją
+- [x] RouteViewModel.kt — stan aplikacji, binding do serwisu, selectedRoute, routeToShow
+- [x] ui/components/RouteSummarySheet.kt — bottom sheet z podsumowaniem trasy
+- [x] ui/components/RecordingStats.kt — pasek statystyk podczas nagrywania
+- [x] ui/MapScreen.kt — główny ekran z mapą, rysowanie tras (niebieska=aktywna, pomarańczowa=zapisana)
+- [x] ui/RouteListScreen.kt — lista zapisanych tras
+- [x] MainActivity.kt — Navigation Compose, ekrany Map i RouteList
+
+## Co pozostało (przerwane przez limit kredytów)
+- [ ] Zaktualizować pliki theme (Color.kt, Theme.kt) — sesja przerwana właśnie tutaj
+- [ ] Upewnić się że res/values/themes.xml ma właściwy motyw dla `com.routetracker.app`
+- [ ] Sprawdzić czy zip4j jest używany (był w libs.versions.toml ale może nie w build.gradle)
+- [ ] Test kompilacji — potencjalne brakujące importy do weryfikacji
+
+## Ważne szczegóły techniczne
+- Haversine w MapScreen.kt jest lokalną funkcją `calculateDistanceFromPoints()` (nie w VM)
+- `selectedRouteId` + `routeToShow` w ViewModel obsługują wyświetlanie zapisanej trasy
+- FileProvider authority: `${applicationId}.fileprovider`
+- Serwis zadeklarowany jako `foregroundServiceType="location"`
+- minSdk = 26, targetSdk = 35
+
+## Następny krok
+Sprawdź i zaktualizuj pliki theme:
+`app/src/main/res/values/themes.xml` oraz
+`app/src/main/java/com/routetracker/app/ui/theme/`

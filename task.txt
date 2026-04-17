@@ -1,0 +1,120 @@
+Create a complete native Android application in Kotlin. The app targets Android 8.0+ (API 26+), uses a single-Activity architecture with Jetpack Compose for UI, and follows MVVM pattern.
+Project structure
+Generate all necessary files with full package path com.routetracker.app:
+
+MainActivity.kt
+TrackingService.kt (foreground service)
+RouteViewModel.kt
+GpxManager.kt
+RouteRepository.kt
+models/Route.kt, models/TrackPoint.kt
+ui/MapScreen.kt, ui/RouteListScreen.kt, ui/components/
+AndroidManifest.xml
+build.gradle.kts (app-level) with all dependencies
+res/values/strings.xml, res/xml/file_paths.xml
+res/drawable/ — any needed vector icons as XML
+
+Dependencies to use (put exact versions in build.gradle.kts):
+
+Jetpack Compose BOM (latest stable)
+osmdroid for the map (OpenStreetMap, no API key needed)
+androidx.lifecycle:lifecycle-viewmodel-compose
+androidx.lifecycle:lifecycle-service
+com.google.android.gms:play-services-location (FusedLocationProviderClient)
+androidx.room (Room database for route persistence)
+androidx.navigation:navigation-compose
+kotlinx.coroutines
+androidx.datastore
+
+
+Foreground Service — TrackingService.kt
+
+Runs as a foreground service with a persistent notification ("Recording route... Xkm | Xmin")
+Notification has a "Stop" action button
+Uses FusedLocationProviderClient with LocationRequest built via LocationRequest.Builder:
+
+priority: PRIORITY_HIGH_ACCURACY
+interval: 3000ms
+minUpdateDistance: 5f meters
+
+
+Exposes a StateFlow<List<TrackPoint>> and StateFlow<Boolean> isRecording
+Bound service — ViewModel binds to it via ServiceConnection
+On stop: passes collected points back, then stops itself
+Filtering: skip points with accuracy > 30f
+
+Room Database
+
+Entity: RouteEntity — id, name, date (Long), distanceKm (Double), durationSeconds (Long), gpxFilePath (String)
+TrackPointEntity — id, routeId (FK), lat, lng, ele, timestamp
+DAO with: insert, getAll, getById, deleteById, getPointsForRoute
+RouteRepository wraps DAO + GPX file ops
+
+GPX Manager — GpxManager.kt
+
+Generates valid GPX 1.1 XML string from a list of TrackPoints
+Saves .gpx file to app's external files dir (getExternalFilesDir("GPX"))
+Returns Uri via FileProvider for sharing
+exportGpx(routeId) — opens Android share sheet with the .gpx file
+deleteGpxFile(filePath)
+Calculate total distance (Haversine formula between consecutive points)
+Calculate duration, avg speed, max speed
+
+
+UI — Jetpack Compose
+MapScreen (main screen)
+
+Full-screen osmdroid MapView embedded via AndroidView
+Configure osmdroid: set user agent, enable multi-touch, enable built-in zoom controls
+Live polyline drawn on the map while recording (blue, 5dp width) — updates as new points arrive via StateFlow
+After recording stops: route stays visible on map (orange)
+When a saved route is selected: show it on map and animate camera to fit all points
+FAB or bottom bar with:
+
+Left: menu icon → navigates to RouteListScreen
+Center: large START (green) / STOP (red) button — shows pulsing CircularProgressIndicator ring while recording
+Right: "locate me" icon button — animates map to current location
+
+
+Stats bar above the bottom bar (visible only while recording): elapsed time | distance | speed | points count
+Summary bottom sheet shown after stopping: total distance, duration, avg speed, max speed, route name (editable TextField), "Save" button
+
+RouteListScreen
+
+LazyColumn listing all saved routes
+Each item: route name, formatted date, distance (km), duration
+Swipe-to-delete with undo snackbar (DismissDirection.EndToStart)
+Per-item action icons: "Show on map" (navigates back to MapScreen and loads route), "Share GPX" (triggers share sheet)
+Top bar: title "Saved Routes", back arrow, "Export all" icon (creates a zip of all GPX files using ZipOutputStream and shares it)
+Empty state: centered illustration text + "No routes yet"
+
+
+Permissions handling
+
+Request at runtime: ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BACKGROUND_LOCATION (Android 10+), POST_NOTIFICATIONS (Android 13+)
+Use rememberPermissionState / rememberMultiplePermissionsState from accompanist-permissions
+Show rationale dialog before requesting background location separately (required by Google policy)
+If denied: show a full-screen error composable with a button that opens app settings via Intent
+
+AndroidManifest.xml
+Include all required entries:
+
+<uses-permission> for INTERNET, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BACKGROUND_LOCATION, FOREGROUND_SERVICE, FOREGROUND_SERVICE_LOCATION, POST_NOTIFICATIONS, WRITE_EXTERNAL_STORAGE (for API < 29)
+TrackingService declared with android:foregroundServiceType="location"
+FileProvider declared under <provider> with android:authorities="${applicationId}.fileprovider"
+osmdroid user agent meta-data
+
+Battery optimization
+
+In the notification, add action "Optimize battery" that opens ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS intent
+In onStartCommand, call startForeground() immediately (within 5 seconds)
+Use PARTIAL_WAKE_LOCK via PowerManager inside the service to prevent CPU sleep during recording
+Release wake lock in onDestroy
+
+
+Output instructions
+
+Output each file separately, clearly labeled with its full path (e.g. // FILE: app/src/main/kotlin/com/routetracker/app/MainActivity.kt)
+All files must be complete — no placeholders, no // TODO, no ...
+Code must compile without errors
+Add brief inline comments for non-obvious logic (Haversine, GPX generation, service binding)

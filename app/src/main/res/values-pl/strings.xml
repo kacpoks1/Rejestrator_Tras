@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rejestrator Tras</string>
+    <string name="start_recording">Start</string>
+    <string name="stop_recording">Stop</string>
+    <string name="recording_route">Nagrywanie trasy…</string>
+    <string name="stop">Zatrzymaj</string>
+    <string name="optimize_battery">Optymalizuj baterię</string>
+    <string name="locate_me">Moja pozycja</string>
+    <string name="saved_routes">Zapisane Trasy</string>
+    <string name="no_routes">Brak zapisanych tras</string>
+    <string name="no_routes_description">Zacznij nagrywać, aby utworzyć swoją pierwszą trasę</string>
+    <string name="route_name">Nazwa trasy</string>
+    <string name="save">Zapisz</string>
+    <string name="cancel">Anuluj</string>
+    <string name="show_on_map">Pokaż na mapie</string>
+    <string name="share_gpx">Udostępnij GPX</string>
+    <string name="delete">Usuń</string>
+    <string name="export_all">Eksportuj wszystko</string>
+    <string name="route_deleted">Trasa usunięta</string>
+    <string name="undo">Cofnij</string>
+    <string name="permission_required">Wymagane uprawnienia</string>
+    <string name="location_permission_rationale">Uprawnienia do lokalizacji są wymagane do śledzenia Twojej trasy</string>
+    <string name="background_location_rationale">Uprawnienia do lokalizacji w tle pozwalają śledzić trasę nawet gdy aplikacja nie jest widoczna. Jest to wymagane do poprawnego działania usługi śledzenia.</string>
+    <string name="grant_permission">Przyznaj uprawnienia</string>
+    <string name="open_settings">Otwórz ustawienia</string>
+    <string name="distance">Dystans</string>
+    <string name="duration">Czas</string>
+    <string name="speed">Prędkość</string>
+    <string name="points">Punkty</string>
+    <string name="avg_speed">Śr. prędkość</string>
+    <string name="max_speed">Maks. prędkość</string>
+    <string name="route_summary">Podsumowanie trasy</string>
+    <string name="enter_route_name">Wprowadź nazwę trasy</string>
+</resources>
